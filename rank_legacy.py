@@ -9,9 +9,9 @@ import csv
 
 sitename = sys.argv[1]
 keyword = "+".join(sys.argv[2:])
- 
-print("site: %s keyword: %s" % (sitename, keyword))
- 
+
+print(f"site: {sitename} keyword: {keyword}")
+
 agent = [
 ## Chrome 60 Windows
 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
@@ -33,19 +33,19 @@ agent = [
 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0']
 
- 
+
 parser = 'html.parser'
 
 useragent = random.choice(agent)
- 
+
 browser = RoboBrowser(history=False,
                       user_agent=useragent,
                       parser=parser)
- 
-browser.open('https://www.google.com/search?num=100&q=' + keyword)
- 
+
+browser.open(f'https://www.google.com/search?num=100&q={keyword}')
+
 links = browser.find_all("div", {"class": "g"})
- 
+
 counter = 0
 
 # print('The user Agent you used was ----> ' + useragent)
@@ -56,13 +56,10 @@ for i in links:
     if sitename in str(i):
         url = i.find_all('a', href=True)
         position = "%d" % (counter)
-        rank = "%s" % (url[0]['href'])
+        rank = f"{url[0]['href']}"
         now = datetime.date.today().strftime("%d-%m-%Y")
         keyword = keyword
-        d.append(keyword)
-        d.append(position)
-        d.append(rank)
-        d.append(now)
+        d.extend((keyword, position, rank, now))
         print(keyword, position, rank, now)
 
 
@@ -71,4 +68,4 @@ file =datetime.date.today().strftime("%d-%m-%Y")+'-' +keyword + '.csv'
 with open(file, 'w') as f:
     writer = csv.writer(f)
     writer.writerow(['Keyword' , 'Rank', 'URL' , 'Date'])
-    writer.writerows(zip( d[0::4], d[1::4] , d[2::4], d[3::4]))
+    writer.writerows(zip(d[::4], d[1::4], d[2::4], d[3::4]))

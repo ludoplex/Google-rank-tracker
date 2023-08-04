@@ -65,18 +65,18 @@ useragent: selected randomly from list when we know device.
 """
 def mobile(keyword,sitename,device,useragent):
     parser = 'html.parser'
- 
+
     browser = RoboBrowser(history=False,
                           user_agent=useragent,
                           parser=parser)
-     
+
     browser.open('https://www.google.com/search?num=100&q=' + keyword)
-    
+
     #this is the div that only shows up on mobile device. This might change not sure :/ 
     links = browser.find_all("div", {"class": "KJDcUb"})
 
     # links = browser.find_all("div", {"class": "g"})
-     
+
     counter = 0
 
 
@@ -89,35 +89,31 @@ def mobile(keyword,sitename,device,useragent):
         if sitename in str(i):
             url = i.find_all('a', href=True)
             position = "%d" % (counter)
-            rank = "%s" % (url[0]['href'])
+            rank = f"{url[0]['href']}"
             now = datetime.date.today().strftime("%d-%m-%Y")
             keyword = keyword
             device = device
-            d.append(keyword)
-            d.append(position)
-            d.append(rank)
-            d.append(device)
-            d.append(now)
+            d.extend((keyword, position, rank, device, now))
             print(keyword, position, rank, device, now)
-    
+
     #invoking csv export function 
     csv_export(d,keyword,device)
 
 #desktop function. Exactly the same as mobile with the difference of div that we look for our URLs
 def desktop(keyword,sitename,device,useragent):
     parser = 'html.parser'
- 
+
     browser = RoboBrowser(history=False,
                           user_agent=useragent,
                           parser=parser)
-     
+
     browser.open('https://www.google.com/search?num=100&q=' + keyword)
-     
+
     # links = browser.find_all("div", {"class": "KJDcUb"})
 
     #desktop div where URLs are
     links = browser.find_all("div", {"class": "g"})
-     
+
     counter = 0
 
     print('The user Agent you used was ----> ' + useragent)
@@ -128,17 +124,13 @@ def desktop(keyword,sitename,device,useragent):
         if sitename in str(i):
             url = i.find_all('a', href=True)
             position = "%d" % (counter)
-            rank = "%s" % (url[0]['href'])
+            rank = f"{url[0]['href']}"
             now = datetime.date.today().strftime("%d-%m-%Y")
             keyword = keyword
             device = device
-            d.append(keyword)
-            d.append(position)
-            d.append(rank)
-            d.append(device)
-            d.append(now)
+            d.extend((keyword, position, rank, device, now))
             print(keyword, position, rank, device, now)
-    
+
     csv_export(d,keyword,device)
 
 #function to export to csv file.
@@ -153,7 +145,7 @@ def csv_export(d,keyword,device):
     with open(file, 'w') as f:
         writer = csv.writer(f)
         writer.writerow(['Keyword' , 'Rank', 'URL' ,'Device', 'Date'])
-        writer.writerows(zip( d[0::5], d[1::5] , d[2::5], d[3::5] , d[4::5]))
+        writer.writerows(zip(d[::5], d[1::5], d[2::5], d[3::5], d[4::5]))
 
 
 #Keyword file
